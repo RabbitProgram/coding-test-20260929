@@ -1,5 +1,6 @@
 {
   "enabledPlugins": {
-    "docker-skills@docker": true
+    "docker-skills@docker": true,
+    "pg@aiguide": true
   }
 }
