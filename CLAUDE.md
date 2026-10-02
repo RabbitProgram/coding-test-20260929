@@ -7,10 +7,10 @@
 
 | ディレクトリ | 内容 |
 |---|---|
-| `backend/` | NestJS 12（ESM）/ TypeORM 1.x / Vitest 5 / oxlint |
-| `frontend/` | Next.js 16（App Router）/ Tailwind CSS 4 / `@vis.gl/react-google-maps` / Vitest 5 + Testing Library |
+| `backend/` | NestJS（ESM）/ TypeORM / Vitest / oxlint |
+| `frontend/` | Next.js（App Router）/ Tailwind CSS / `@vis.gl/react-google-maps` / Vitest + Testing Library |
 | `backend/seeds/seed.csv` | シードデータ（起動時に DB へ自動投入） |
-| `docker-compose.yml` | `db`（`postgis/postgis:18-3.6`）/ `backend` / `frontend` |
+| `docker-compose.yml` | `db`（PostgreSQL + PostGIS）/ `backend` / `frontend` |
 
 - 起動: `docker compose up`（`.env` は任意。地図には `.env` の `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` が必要）
 - Docker は OrbStack ではなく Docker Desktop を使う（`DOCKER_CONTEXT=desktop-linux`）
@@ -28,7 +28,7 @@
 
 ### テストの書き方（Vitest）
 
-backend / frontend の両方で Vitest 5 を使う。書く前に、[vitest スキル](.agents/skills/vitest/SKILL.md)（Vitest 5 向け）を参照する。
+backend / frontend の両方で Vitest を使う。書く前に、[vitest スキル](.agents/skills/vitest/SKILL.md)を参照する。
 
 - **DB やネットワークなしで動くテスト**にする。外部との境界は、モックやスタブに差し替える。
 - 正常系だけでなく、不正値・境界・エラーのケースも書く。
@@ -61,7 +61,6 @@ backend / frontend の両方で Vitest 5 を使う。書く前に、[vitest ス�
 
 ### バックエンド
 - **スキーマの変更はマイグレーションのみ**（`backend/src/database/migrations/`）。`synchronize` は使わない。ファイル名は `kebab-case.ts`、クラス名の末尾に 13 桁のタイムスタンプを付ける（TypeORM の仕様）。
-- **シード**は `backend/seeds/seed.csv`。`name` をキーに upsert するので、何度起動しても重複しない。`name` は CSV 内で一意にする。
 - **PostGIS**: 座標は `geography(Point, 4326)`。**経度, 緯度の順**（`ST_MakePoint(lng, lat)`、GeoJSON も同じ）。距離の絞り込みは `ST_Distance` ではなく `ST_DWithin`。値はパラメータ化して渡す。
 - **エンドポイントは、依頼されたときだけ追加する**。
 
@@ -76,12 +75,11 @@ cd ../frontend && npm run api:types   # openapi.json → lib/api/schema.d.ts
 - レスポンスは DTO クラス（`@ApiProperty` に `description` を付ける）で定義し、`@ApiOkResponse` を付ける。
 - `openapi.json` の更新を忘れると、backend のテスト（`src/openapi/openapi.spec.ts`）が失敗する。
 - フロントは、`lib/api/client.ts` の型付きクライアント（`openapi-fetch`）で呼ぶ。素の `fetch` と `as` でのキャストは使わない。
-- Swagger UI は `/docs`（`NODE_ENV=production` では無効）。
 
 ### パッケージ
 - 追加・更新は、最新の安定版を使う。互換性がなくて上げられないものは、理由を報告する。
 - 次のものは、意図して固定・据え置きしている。
-  - `@nestjs/core` 12.1.2 / `@nestjs/cli` 12.0.8（指定バージョンに固定）
+  - `@nestjs/core` / `@nestjs/cli` は、指定されたバージョンに固定（`package.json` を参照）
   - `typescript` は 6.x（7 は Nest CLI が未対応。frontend は `typescript-eslint` が 6.1 未満まで）
   - `eslint`（frontend）は 9 系（10 は Next.js の設定が使うプラグインが未対応）
   - `@types/node` は 24 系（実行環境 Node 24 に合わせる）
@@ -90,4 +88,3 @@ cd ../frontend && npm run api:types   # openapi.json → lib/api/schema.d.ts
 ### その他
 - **秘密情報**: `.env` はコミットしない。API キーを、出力や報告に貼らない。
 - **テーブル名やマイグレーション名を変えたとき**は、既存の DB と食い違うので、`docker compose down -v` でボリュームを作り直す。
-- 地図の初期位置は、東京駅（縮尺 13）。`frontend/components/spot-map.tsx`。
