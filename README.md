@@ -29,6 +29,7 @@ API キーは Google Cloud で「Maps JavaScript API」を有効化して発行�
 - http://localhost:3000 — スポットをマーカー表示する地図（要 API キー）
 - http://localhost:3001/ — backend が起動していれば `{"status":"ok"}`
 - http://localhost:3001/spots — スポット一覧（JSON）
+- http://localhost:3001/docs — Swagger UI（開発時のみ。`NODE_ENV=production` では無効）／ `/docs-json` は OpenAPI 仕様
 
 ## DB
 

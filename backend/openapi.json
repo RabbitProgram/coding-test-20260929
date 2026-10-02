@@ -3,11 +3,12 @@
   "paths": {
     "/": {
       "get": {
+        "description": "バックエンドが起動していれば `{ \"status\": \"ok\" }` を返す。DB の接続状態までは確認しない。",
         "operationId": "AppController_getStatus",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "",
+            "description": "起動している",
             "content": {
               "application/json": {
                 "schema": {
@@ -17,18 +18,20 @@
             }
           }
         },
+        "summary": "起動確認",
         "tags": [
-          "App"
+          "Status"
         ]
       }
     },
     "/spots": {
       "get": {
+        "description": "登録されているすべてのスポットを、id の昇順で返す。絞り込みやページングは未対応（常に全件）。",
         "operationId": "SpotsController_findAll",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "",
+            "description": "スポットの配列",
             "content": {
               "application/json": {
                 "schema": {
@@ -41,6 +44,7 @@
             }
           }
         },
+        "summary": "スポット一覧の取得",
         "tags": [
           "Spots"
         ]
@@ -48,8 +52,8 @@
     }
   },
   "info": {
-    "title": "Spot API",
-    "description": "",
+    "title": "位置情報探索アプリ API",
+    "description": "観光地などのスポットと、その位置情報（緯度・経度）を返す API",
     "version": "1.0",
     "contact": {}
   },
@@ -62,7 +66,8 @@
         "properties": {
           "status": {
             "type": "string",
-            "example": "ok"
+            "example": "ok",
+            "description": "起動していれば常に \"ok\""
           }
         },
         "required": [
@@ -75,30 +80,33 @@
           "id": {
             "type": "string",
             "example": "1",
-            "description": "bigint のため文字列で返す"
+            "description": "スポット ID（bigint のため文字列で返す）"
           },
           "name": {
             "type": "string",
-            "example": "東京タワー"
+            "example": "東京タワー",
+            "description": "スポット名"
           },
           "category": {
             "type": "string",
-            "example": "観光名所"
+            "example": "観光名所",
+            "description": "カテゴリ（観光名所、公園、寺院など）"
           },
           "address": {
             "type": "string",
             "nullable": true,
-            "example": "東京都港区"
+            "example": "東京都港区",
+            "description": "住所。未登録の場合は null"
           },
           "lat": {
             "type": "number",
             "example": 35.658581,
-            "description": "緯度"
+            "description": "緯度（WGS84）"
           },
           "lng": {
             "type": "number",
             "example": 139.745433,
-            "description": "経度"
+            "description": "経度（WGS84）"
           }
         },
         "required": [

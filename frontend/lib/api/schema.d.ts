@@ -11,6 +11,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * 起動確認
+         * @description バックエンドが起動していれば `{ "status": "ok" }` を返す。DB の接続状態までは確認しない。
+         */
         get: operations["AppController_getStatus"];
         put?: never;
         post?: never;
@@ -27,6 +31,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * スポット一覧の取得
+         * @description 登録されているすべてのスポットを、id の昇順で返す。絞り込みやページングは未対応（常に全件）。
+         */
         get: operations["SpotsController_findAll"];
         put?: never;
         post?: never;
@@ -41,28 +49,40 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         StatusResponseDto: {
-            /** @example ok */
+            /**
+             * @description 起動していれば常に "ok"
+             * @example ok
+             */
             status: string;
         };
         SpotResponseDto: {
             /**
-             * @description bigint のため文字列で返す
+             * @description スポット ID（bigint のため文字列で返す）
              * @example 1
              */
             id: string;
-            /** @example 東京タワー */
+            /**
+             * @description スポット名
+             * @example 東京タワー
+             */
             name: string;
-            /** @example 観光名所 */
+            /**
+             * @description カテゴリ（観光名所、公園、寺院など）
+             * @example 観光名所
+             */
             category: string;
-            /** @example 東京都港区 */
+            /**
+             * @description 住所。未登録の場合は null
+             * @example 東京都港区
+             */
             address: string | null;
             /**
-             * @description 緯度
+             * @description 緯度（WGS84）
              * @example 35.658581
              */
             lat: number;
             /**
-             * @description 経度
+             * @description 経度（WGS84）
              * @example 139.745433
              */
             lng: number;
@@ -85,6 +105,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description 起動している */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -104,6 +125,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description スポットの配列 */
             200: {
                 headers: {
                     [name: string]: unknown;
