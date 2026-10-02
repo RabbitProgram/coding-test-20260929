@@ -41,3 +41,23 @@ API キーは Google Cloud で「Maps JavaScript API」を有効化して発行�
 - ソースはコンテナにマウントされ、ホットリロードされます。
 - 依存パッケージを変更したら: `docker compose up --build -V`
 - backend のテスト: `cd backend && npm test`（DB 不要）
+
+## API の型（backend → frontend）
+
+フロントの API 呼び出しは、backend の定義から自動生成した型で保護されています（URL や項目名の typo はコンパイルエラーになります）。
+
+```
+backend の DTO/コントローラー
+  → backend/openapi.json（OpenAPI 仕様）
+  → frontend/lib/api/schema.d.ts（型）
+  → frontend/lib/api/client.ts（openapi-fetch の型付きクライアント）
+```
+
+backend の API（エンドポイントやレスポンス）を変えたら、次の順に実行します。
+
+```bash
+cd backend && npm run openapi     # openapi.json を更新（DB 不要）
+cd ../frontend && npm run api:types  # schema.d.ts を更新
+```
+
+`openapi.json` の更新を忘れると、backend のテスト（`npm test`）が失敗します。

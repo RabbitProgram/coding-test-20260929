@@ -1,0 +1,115 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/spots": {
+      "get": {
+        "operationId": "SpotsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SpotResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Spots"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Spot API",
+    "description": "",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "StatusResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "SpotResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1",
+            "description": "bigint のため文字列で返す"
+          },
+          "name": {
+            "type": "string",
+            "example": "東京タワー"
+          },
+          "category": {
+            "type": "string",
+            "example": "観光名所"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true,
+            "example": "東京都港区"
+          },
+          "lat": {
+            "type": "number",
+            "example": 35.658581,
+            "description": "緯度"
+          },
+          "lng": {
+            "type": "number",
+            "example": 139.745433,
+            "description": "経度"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "category",
+          "address",
+          "lat",
+          "lng"
+        ]
+      }
+    }
+  }
+}

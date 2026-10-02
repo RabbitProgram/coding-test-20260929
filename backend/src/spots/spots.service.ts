@@ -2,17 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Spot } from './spot.entity.js';
+import { SpotResponseDto } from './spot-response.dto.js';
 
-export interface SpotResponse {
-  id: string;
-  name: string;
-  category: string;
-  address: string | null;
-  lat: number;
-  lng: number;
-}
-
-export function toSpotResponse(spot: Spot): SpotResponse {
+export function toSpotResponse(spot: Spot): SpotResponseDto {
   // GeoJSON は [経度, 緯度] の順
   const [lng, lat] = spot.location.coordinates;
   return {
@@ -31,7 +23,7 @@ export class SpotsService {
     @InjectRepository(Spot) private readonly spots: Repository<Spot>,
   ) {}
 
-  async findAll(): Promise<SpotResponse[]> {
+  async findAll(): Promise<SpotResponseDto[]> {
     const spots = await this.spots.find({ order: { id: 'ASC' } });
     return spots.map(toSpotResponse);
   }
