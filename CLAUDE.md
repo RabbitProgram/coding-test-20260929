@@ -37,11 +37,12 @@ backend / frontend の両方で Vitest 5 を使う。書く前に、[vitest ス�
 
 | | backend | frontend |
 |---|---|---|
-| ファイル | ソースの隣に `*.spec.ts`。HTTP 層は `test/*.e2e-spec.ts` | ソースの隣に `*.test.ts` / `*.test.tsx` |
-| 環境 | Node（`@nestjs/testing`、サービスはスタブ） | jsdom + `@testing-library/react`（`vitest.config.mts`） |
-| 実行 | `cd backend && npm test` / `npm run test:e2e` / `npm run lint` | `cd frontend && npm test` / `npm run lint` / `npx tsc --noEmit` |
+| ファイル | ソースの隣に `*.spec.ts` | ソースの隣に `*.test.ts` / `*.test.tsx` |
+| 環境 | Node（DB 不要） | jsdom + `@testing-library/react`（`vitest.config.mts`） |
+| 実行 | `cd backend && npm test` / `npm run lint` | `cd frontend && npm test` / `npm run lint` / `npx tsc --noEmit` |
 
 - backend: 純粋な関数は、切り出して直接テストする（例: `seed-loader.ts`、`toSpotResponse`）。
+- backend: サービスをスタブにして、コントローラーの戻り値を `supertest` で比べるだけの HTTP 層のテストは書かない（確認できる範囲が狭い）。DB まで通して確認したい場合は、実際の DB を使う結合テストとして別に設計する。
 - frontend: API 呼び出しは `./api/client` をモックしてテストする（例: `lib/spots.test.ts`）。地図コンポーネント（`components/spot-map.tsx`）は、Google Maps のモックが必要で、配線の確認にしかならないため、テストしない（ブラウザで確認する）。テストしたいロジックが増えたら、地図から切り離した関数やフックにして、直接テストする。
 - frontend: **`async` なサーバーコンポーネント（`app/page.tsx` など）は、Vitest でテストできない**。ロジックを、`lib/` や同期のコンポーネントに切り出してテストし、ページ自体は `docker compose up` で動作を確認する。
 
