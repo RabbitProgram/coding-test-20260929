@@ -33,7 +33,7 @@ export interface paths {
         };
         /**
          * スポット一覧の取得
-         * @description 登録されているすべてのスポットを、id の昇順で返す。絞り込みやページングは未対応（常に全件）。
+         * @description 登録されているスポットを返す。lat・lng・radius を指定すると、中心から radius メートル以内のスポットだけを、近い順に（distance つきで）返す。指定しない場合は、id の昇順で全件を返す。
          */
         get: operations["SpotsController_findAll"];
         put?: never;
@@ -86,6 +86,11 @@ export interface components {
              * @example 139.745433
              */
             lng: number;
+            /**
+             * @description 中心からの距離（メートル）。lat / lng / radius で絞り込んだときだけ返す
+             * @example 1234.5
+             */
+            distance?: number;
         };
     };
     responses: never;
@@ -118,7 +123,14 @@ export interface operations {
     };
     SpotsController_findAll: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 中心の緯度（WGS84）。lng と radius とセットで指定する */
+                lat?: number;
+                /** @description 中心の経度（WGS84）。lat と radius とセットで指定する */
+                lng?: number;
+                /** @description 中心からの距離（メートル）。0 より大きく 1000000 以下。lat と lng とセットで指定する */
+                radius?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -133,6 +145,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SpotResponseDto"][];
                 };
+            };
+            /** @description lat・lng・radius の一部だけの指定、または範囲外の値 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

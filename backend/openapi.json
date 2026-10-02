@@ -26,9 +26,40 @@
     },
     "/spots": {
       "get": {
-        "description": "登録されているすべてのスポットを、id の昇順で返す。絞り込みやページングは未対応（常に全件）。",
+        "description": "登録されているスポットを返す。lat・lng・radius を指定すると、中心から radius メートル以内のスポットだけを、近い順に（distance つきで）返す。指定しない場合は、id の昇順で全件を返す。",
         "operationId": "SpotsController_findAll",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "lat",
+            "required": false,
+            "in": "query",
+            "description": "中心の緯度（WGS84）。lng と radius とセットで指定する",
+            "schema": {
+              "example": 35.681236,
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": false,
+            "in": "query",
+            "description": "中心の経度（WGS84）。lat と radius とセットで指定する",
+            "schema": {
+              "example": 139.767125,
+              "type": "number"
+            }
+          },
+          {
+            "name": "radius",
+            "required": false,
+            "in": "query",
+            "description": "中心からの距離（メートル）。0 より大きく 1000000 以下。lat と lng とセットで指定する",
+            "schema": {
+              "example": 5000,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "スポットの配列",
@@ -42,6 +73,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "lat・lng・radius の一部だけの指定、または範囲外の値"
           }
         },
         "summary": "スポット一覧の取得",
@@ -107,6 +141,11 @@
             "type": "number",
             "example": 139.745433,
             "description": "経度（WGS84）"
+          },
+          "distance": {
+            "type": "number",
+            "example": 1234.5,
+            "description": "中心からの距離（メートル）。lat / lng / radius で絞り込んだときだけ返す"
           }
         },
         "required": [

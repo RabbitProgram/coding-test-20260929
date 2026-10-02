@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module.js';
@@ -5,6 +6,11 @@ import { API_TITLE, createOpenApiDocument } from './openapi/create-document.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // クエリを DTO の型（数値）に変換し、検証する
+  app.useGlobalPipes(
+    new ValidationPipe({ transform: true, stopAtFirstError: true }),
+  );
 
   // Swagger UI（/docs）と仕様（/docs-json）。本番では公開しない
   if (process.env.NODE_ENV !== 'production') {

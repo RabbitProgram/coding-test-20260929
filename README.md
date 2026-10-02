@@ -26,9 +26,9 @@ API キーは Google Cloud で「Maps JavaScript API」を有効化して発行�
 
 起動時の流れ: `db` が ready → `backend` がマイグレーション実行 → シード投入 → 起動 → `frontend` 起動。
 
-- http://localhost:3000 — スポットをマーカー表示する地図と、表示範囲内のスポット一覧（要 API キー）
+- http://localhost:3000 — スポットをマーカー表示する地図と、スポット一覧（要 API キー）。一覧は、表示範囲内のスポット、または「地図の中心からの距離」で絞り込んだスポット（距離は、スライダー、または地図上の円の線をドラッグして指定。絞り込み中、範囲外のピンはグレー）
 - http://localhost:3001/ — backend が起動していれば `{"status":"ok"}`
-- http://localhost:3001/spots — スポット一覧（JSON）
+- http://localhost:3001/spots — スポット一覧（JSON）。`?lat=&lng=&radius=`（メートル）を付けると、中心から指定距離以内のスポットを近い順に返す（PostGIS）
 - http://localhost:3001/docs — Swagger UI（開発時のみ。`NODE_ENV=production` では無効）／ `/docs-json` は OpenAPI 仕様
 
 ## DB

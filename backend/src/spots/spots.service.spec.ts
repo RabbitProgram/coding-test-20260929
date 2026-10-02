@@ -21,4 +21,18 @@ describe('toSpotResponse', () => {
       lng: 139.767125,
     });
   });
+
+  it('距離を渡したときだけ、distance を含める', () => {
+    const spot = {
+      id: '1',
+      name: '東京駅',
+      category: '交通機関',
+      address: null,
+      location: { type: 'Point', coordinates: [139.767125, 35.681236] },
+      createdAt: new Date(),
+    } as Spot;
+
+    expect(toSpotResponse(spot, 1234.5).distance).toBe(1234.5);
+    expect(toSpotResponse(spot)).not.toHaveProperty('distance');
+  });
 });

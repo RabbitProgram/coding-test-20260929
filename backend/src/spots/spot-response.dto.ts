@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /** GET /spots が返す 1 件分。フロントの型は、この定義から自動生成する */
 export class SpotResponseDto {
@@ -30,4 +30,11 @@ export class SpotResponseDto {
 
   @ApiProperty({ example: 139.745433, description: '経度（WGS84）' })
   lng: number;
+
+  @ApiPropertyOptional({
+    example: 1234.5,
+    description:
+      '中心からの距離（メートル）。lat / lng / radius で絞り込んだときだけ返す',
+  })
+  distance?: number;
 }
