@@ -7,7 +7,7 @@ export const metadata = { title: "スポットマップ" };
 function Notice({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex flex-1 items-center justify-center p-8">
-      <p className="max-w-md text-center text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="max-w-md text-center text-sm text-zinc-600">
         {children}
       </p>
     </main>

@@ -12,6 +12,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    // TypeScript 6 は @types を自動で読み込まないので、google.maps の型を指定する
+    "types": ["google.maps"],
     "incremental": true,
     "plugins": [
       {
