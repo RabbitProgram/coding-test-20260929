@@ -53,7 +53,7 @@
   },
   "info": {
     "title": "位置情報探索アプリ API",
-    "description": "観光地などのスポットと、その位置情報（緯度・経度）を返す API",
+    "description": "コーディングテスト用",
     "version": "1.0",
     "contact": {}
   },
