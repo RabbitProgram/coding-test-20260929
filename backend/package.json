@@ -15,6 +15,7 @@
     "start:debug": "nest start --debug --watch",
     "db:migrate": "nest build && node dist/database/migrate.js",
     "db:seed": "node dist/database/seed.js",
+    "openapi": "nest build && node dist/openapi/generate.js",
     "start:docker": "npm run db:migrate && npm run db:seed && nest start --watch",
     "start:prod": "node dist/main",
     "lint": "oxlint --type-aware src/ test/",
@@ -28,6 +29,7 @@
     "@nestjs/common": "^12.0.1",
     "@nestjs/core": "12.1.2",
     "@nestjs/platform-express": "^12.0.1",
+    "@nestjs/swagger": "^12.0.2",
     "@nestjs/typeorm": "^12.0.2",
     "csv-parse": "^7.0.3",
     "pg": "^8.23.1",
@@ -42,7 +44,7 @@
     "@nestjs/testing": "^12.0.1",
     "@types/express": "^5.0.0",
     "@types/geojson": "^7946.0.16",
-    "@types/node": "^24.0.0",
+    "@types/node": "^24.19.1",
     "@types/pg": "^8.23.1",
     "@types/supertest": "^7.0.0",
     "@vitest/coverage-v8": "^5.0.3",
@@ -51,8 +53,7 @@
     "prettier": "^3.4.2",
     "source-map-support": "^0.5.21",
     "supertest": "^7.0.0",
-    "typescript": "^6.0.2",
-    "vite-tsconfig-paths": "^5.1.4",
+    "typescript": "^6.0.3",
     "vitest": "^5.0.3"
   }
 }
