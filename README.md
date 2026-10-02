@@ -14,12 +14,21 @@ Next.js + NestJS + PostgreSQL/PostGIS の開発用スケルトン。
 docker compose up --build
 ```
 
-`.env` は不要です（既定値で動きます）。変更したい場合は `cp .env.example .env`。
+`.env` がなくても起動します（既定値で動きます）。ただし、地図を表示するには Google Maps の API キーが必要です。
+
+```bash
+cp .env.example .env
+# .env の NEXT_PUBLIC_GOOGLE_MAPS_API_KEY に API キーを設定
+docker compose up
+```
+
+API キーは Google Cloud で「Maps JavaScript API」を有効化して発行します。ブラウザに公開されるキーなので、「HTTPリファラー」と「API」の制限を必ず設定してください。
 
 起動時の流れ: `db` が ready → `backend` がマイグレーション実行 → シード投入 → 起動 → `frontend` 起動。
 
-- http://localhost:3000 — Next.js のデフォルトページ
-- http://localhost:3001/ — backend が起動していれば `{"status":"ok"}`（エンドポイントはこれだけ）
+- http://localhost:3000 — スポットをマーカー表示する地図（要 API キー）
+- http://localhost:3001/ — backend が起動していれば `{"status":"ok"}`
+- http://localhost:3001/spots — スポット一覧（JSON）
 
 ## DB
 
