@@ -41,7 +41,8 @@ API キーは Google Cloud で「Maps JavaScript API」を有効化して発行�
 
 - ソースはコンテナにマウントされ、ホットリロードされます。
 - 依存パッケージを変更したら: `docker compose up --build -V`
-- backend のテスト: `cd backend && npm test`（DB 不要）
+- backend のテスト: `cd backend && npm test`（DB 不要）。e2e は `npm run test:e2e`
+- frontend のテスト: `cd frontend && npm test`（Vitest + Testing Library）
 
 ## API の型（backend → frontend）
 
