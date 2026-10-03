@@ -10,7 +10,7 @@
 | `backend/` | NestJS（ESM）/ TypeORM / Vitest / oxlint |
 | `frontend/` | Next.js（App Router）/ Tailwind CSS / `@vis.gl/react-google-maps` / Vitest + Testing Library |
 | `backend/seeds/seed.csv` | シードデータ（起動時に DB へ自動投入） |
-| `docker-compose.yml` | `db`（PostgreSQL + PostGIS）/ `backend` / `frontend` |
+| `docker-compose.yml` | `db`（PostgreSQL + PostGIS）/ `redis`（キャッシュ）/ `backend` / `frontend` |
 
 - 起動: `docker compose up`（`.env` は任意。地図には `.env` の `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` が必要）
 - Docker は OrbStack ではなく Docker Desktop を使う（`DOCKER_CONTEXT=desktop-linux`）
@@ -84,6 +84,10 @@ cd ../frontend && npm run api:types   # openapi.json → lib/api/schema.d.ts
   - `eslint`（frontend）は 9 系（10 は Next.js の設定が使うプラグインが未対応）
   - `@types/node` は 24 系（実行環境 Node 24 に合わせる）
 - 依存を変えたら、`docker compose up --build -V` で作り直す。
+
+### 外部 API（課金対象）
+- 課金される外部 API（Geocoding など）は、**backend から呼び、結果を Redis にキャッシュする**。ブラウザから直接呼ばない。
+- キャッシュの保存期間は、提供元の規約の範囲に収める（Google は座標のキャッシュが最長 30 日）。Redis が落ちても、キャッシュなしで動くようにする。
 
 ### その他
 - **秘密情報**: `.env` はコミットしない。API キーを、出力や報告に貼らない。

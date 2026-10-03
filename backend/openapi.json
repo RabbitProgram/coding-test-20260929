@@ -83,6 +83,59 @@
           "Spots"
         ]
       }
+    },
+    "/geocode": {
+      "get": {
+        "description": "lat・lng の住所を、丁目までで返す。外部の API は課金対象のため、約 100 m の格子ごとに、結果を Redis に一定期間キャッシュする。",
+        "operationId": "GeocodeController_reverse",
+        "parameters": [
+          {
+            "name": "lat",
+            "required": true,
+            "in": "query",
+            "description": "緯度（WGS84）",
+            "schema": {
+              "example": 35.681236,
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": true,
+            "in": "query",
+            "description": "経度（WGS84）",
+            "schema": {
+              "example": 139.767125,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReverseAddressResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "lat・lng が、数値でない、または範囲外"
+          },
+          "502": {
+            "description": "外部の Geocoding API が失敗した"
+          },
+          "503": {
+            "description": "サーバー用の API キーが設定されていない"
+          }
+        },
+        "summary": "座標から住所を取得",
+        "tags": [
+          "Geocode"
+        ]
+      }
     }
   },
   "info": {
@@ -155,6 +208,20 @@
           "address",
           "lat",
           "lng"
+        ]
+      },
+      "ReverseAddressResponseDto": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "example": "東京都千代田区丸の内１丁目",
+            "nullable": true,
+            "description": "座標の住所（丁目まで。番地・建物名・国名・郵便番号は含まない）。海の上など住所がない場所は null"
+          }
+        },
+        "required": [
+          "address"
         ]
       }
     }
