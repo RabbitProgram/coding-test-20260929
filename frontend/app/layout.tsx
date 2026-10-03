@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Map App",
+  title: "位置情報探索アプリ",
   description: "Next.js + NestJS + PostGIS",
 };
 
