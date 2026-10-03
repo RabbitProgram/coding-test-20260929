@@ -44,6 +44,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/geocode": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 座標から住所を取得
+         * @description lat・lng の住所を、丁目までで返す。外部の API は課金対象のため、約 100 m の格子ごとに、結果を Redis に一定期間キャッシュする。
+         */
+        get: operations["GeocodeController_reverse"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -91,6 +111,13 @@ export interface components {
              * @example 1234.5
              */
             distance?: number;
+        };
+        ReverseAddressResponseDto: {
+            /**
+             * @description 座標の住所（丁目まで。番地・建物名・国名・郵便番号は含まない）。海の上など住所がない場所は null
+             * @example 東京都千代田区丸の内１丁目
+             */
+            address: string | null;
         };
     };
     responses: never;
@@ -148,6 +175,51 @@ export interface operations {
             };
             /** @description lat・lng・radius の一部だけの指定、または範囲外の値 */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GeocodeController_reverse: {
+        parameters: {
+            query: {
+                /** @description 緯度（WGS84） */
+                lat: number;
+                /** @description 経度（WGS84） */
+                lng: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReverseAddressResponseDto"];
+                };
+            };
+            /** @description lat・lng が、数値でない、または範囲外 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description 外部の Geocoding API が失敗した */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description サーバー用の API キーが設定されていない */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

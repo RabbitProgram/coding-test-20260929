@@ -1,32 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
-import { pickAddress } from "@/lib/reverse-geocode";
+import { useMap } from "@vis.gl/react-google-maps";
+import { fetchCenterAddress } from "@/app/actions";
 import { throttle } from "@/lib/throttle";
 
-// 動かしている間も、この間隔で、中心の住所を更新する（課金対象なので、これより細かくしない）
+// 動かしている間も、この間隔で、中心の住所を更新する（外部 API は課金対象なので、これより細かくしない）
 const THROTTLE_MS = 1000;
 
 // 地図の中心の住所を、地図に追従して表示する（逆ジオコーディング）
 export function CenterAddress() {
   const map = useMap();
-  const geocodingLib = useMapsLibrary("geocoding");
   const [address, setAddress] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!map || !geocodingLib) return;
-    const geocoder = new geocodingLib.Geocoder();
-    const lookup = async (location: google.maps.LatLngLiteral) => {
-      try {
-        const { results } = await geocoder.geocode({ location });
-        return pickAddress(results);
-      } catch (error) {
-        // 住所がない場所（海の上など）は、失敗ではなく「なし」として扱う
-        if ((error as { code?: string }).code === "ZERO_RESULTS") return null;
-        throw error;
-      }
-    };
+    if (!map) return;
 
     // 返ってきた順番が前後しても、最後に要求した地点の結果だけを表示する
     let latest = 0;
@@ -34,7 +22,7 @@ export function CenterAddress() {
       const center = map.getCenter()?.toJSON();
       if (!center) return;
       const request = ++latest;
-      lookup(center)
+      fetchCenterAddress(center.lat, center.lng)
         .then((next) => request === latest && setAddress(next))
         // 失敗したときは、古い住所を出し続けない
         .catch(() => request === latest && setAddress(null));
@@ -47,7 +35,7 @@ export function CenterAddress() {
       update.cancel();
       latest++;
     };
-  }, [map, geocodingLib]);
+  }, [map]);
 
   if (!address) return null;
   return (
