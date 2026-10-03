@@ -18,7 +18,7 @@ export class GeocodeController {
   @ApiOperation({
     summary: '座標から住所を取得',
     description:
-      'lat・lng の住所を、丁目までで返す。外部の API は課金対象のため、約 100 m の格子ごとに、結果を Redis に一定期間キャッシュする。',
+      'lat・lng の住所を、丁目までで返す。外部の Geocoding API を呼ぶ。結果は保存しない。',
   })
   @ApiOkResponse({ type: ReverseAddressResponseDto })
   @ApiBadRequestResponse({

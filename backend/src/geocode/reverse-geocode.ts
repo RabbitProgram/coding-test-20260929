@@ -1,17 +1,3 @@
-// 課金対象の API なので、近い地点は、同じ結果を使い回す。
-// 小数第 3 位（約 100 m）で丸めた格子を、1 つの地点として扱う。
-const GRID_DIGITS = 3;
-
-export function snapToGrid(lat: number, lng: number) {
-  return {
-    lat: Number(lat.toFixed(GRID_DIGITS)),
-    lng: Number(lng.toFixed(GRID_DIGITS)),
-  };
-}
-
-export const cacheKey = (lat: number, lng: number) =>
-  `geocode:reverse:${lat},${lng}`;
-
 export interface GeocodeResult {
   formatted_address: string;
   types: string[];

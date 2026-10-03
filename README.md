@@ -10,7 +10,6 @@
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white">
   <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=white">
   <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL_%2B_PostGIS-4169E1?logo=postgresql&logoColor=white">
-  <img alt="Redis" src="https://img.shields.io/badge/Redis-FF4438?logo=redis&logoColor=white">
   <img alt="Docker Compose" src="https://img.shields.io/badge/Docker_Compose-2496ED?logo=docker&logoColor=white">
   <img alt="TypeORM" src="https://img.shields.io/badge/TypeORM-E83524?logo=typeorm&logoColor=white">
   <img alt="Vitest" src="https://img.shields.io/badge/Vitest-6E9F18?logo=vitest&logoColor=white">
