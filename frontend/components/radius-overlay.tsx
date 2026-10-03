@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { createPortal } from "react-dom";
 import { useMap } from "@vis.gl/react-google-maps";
 import type { LatLng } from "@/lib/bounds";
 import { metersPerPixel } from "@/lib/geo";
@@ -18,6 +19,11 @@ const LABEL_GAP_PX = 14;
 const HIDE_DELAY_MS = 700;
 // 有効・無効を切り替えるときの、円の縮む・広がる時間
 const TRANSITION_MS = 400;
+
+// 円は、地図の floatPane（マーカーより上、吹き出しは同じ層）に入れる。
+// 吹き出しより下にするため、層の中では最背面に置く。
+// 吹き出しの z-index は、Google Maps が画面上の位置に応じて負の値（-画面の縦位置）にするので、それより小さくする
+const PANE_Z_INDEX = "-1000000";
 
 const easeOutCubic = (p: number) => 1 - (1 - p) ** 3;
 const easeInQuad = (p: number) => p ** 2;
@@ -42,6 +48,10 @@ export function RadiusOverlay({
   const map = useMap();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
+
+  // 円を入れる、地図の層の要素。層は地図と一緒に動くので、画面の中央に合わせて位置を直す
+  const [pane, setPane] = useState<HTMLDivElement | null>(null);
+  const [frame, setFrame] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
   // 1 ピクセルあたりの距離が決まる、地図の緯度とズーム
   const [view, setView] = useState(() => ({
@@ -80,6 +90,47 @@ export function RadiusOverlay({
       }),
     ];
     return () => listeners.forEach((l) => l.remove());
+  }, [map]);
+
+  useEffect(() => {
+    if (!map) return;
+    const container = document.createElement("div");
+    container.style.position = "absolute";
+    container.style.zIndex = PANE_Z_INDEX;
+
+    const overlay = new google.maps.OverlayView();
+    const place = () => {
+      const center = map.getCenter();
+      const point =
+        center && overlay.getProjection()?.fromLatLngToDivPixel(center);
+      if (!point) return;
+      const { clientWidth: width, clientHeight: height } = map.getDiv();
+      setFrame({
+        x: point.x - width / 2,
+        y: point.y - height / 2,
+        width,
+        height,
+      });
+    };
+    overlay.onAdd = () => {
+      overlay.getPanes()?.floatPane.appendChild(container);
+      setPane(container);
+    };
+    overlay.draw = place;
+    overlay.onRemove = () => {
+      container.remove();
+      setPane(null);
+    };
+    overlay.setMap(map);
+
+    const listeners = [
+      map.addListener("center_changed", place),
+      map.addListener("bounds_changed", place),
+    ];
+    return () => {
+      listeners.forEach((l) => l.remove());
+      overlay.setMap(null);
+    };
   }, [map]);
 
   // 動きが止まったら、少し待ってから消す
@@ -146,12 +197,20 @@ export function RadiusOverlay({
   };
 
   // 外側の要素は、操作を通さない（地図の操作を妨げない）。つかめるのは、円の線の近くだけ
-  return (
+  if (!pane) return null;
+
+  return createPortal(
     <div
       ref={wrapperRef}
-      className={`pointer-events-none absolute inset-0 overflow-hidden ${
+      className={`pointer-events-none absolute overflow-hidden ${
         hidden ? "invisible" : ""
       }`}
+      style={{
+        left: frame.x,
+        top: frame.y,
+        width: frame.width,
+        height: frame.height,
+      }}
     >
       <svg
         width={size}
@@ -206,6 +265,7 @@ export function RadiusOverlay({
       >
         {km} km
       </div>
-    </div>
+    </div>,
+    pane,
   );
 }
