@@ -56,6 +56,8 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
   // 地図の読み込み前は null（一覧は空）
   const [bounds, setBounds] = useState<Bounds | null>(null);
   const [center, setCenter] = useState<LatLng | null>(null);
+  // 地図を動かしている間（止まるまで）。一覧は、止まってから更新するので、その間は最新ではない
+  const [moving, setMoving] = useState(false);
   const [radius, setRadius] = useState({ enabled: false, km: 5 });
   // 距離で絞り込んだ結果。key は、どの条件の結果かを表す（spots: null は取得の失敗）
   const [nearby, setNearby] = useState<{
@@ -118,6 +120,11 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
     ? `中心から ${radius.km} km 以内（${listSpots.length} 件）`
     : `表示範囲のスポット（${listSpots.length} 件）`;
 
+  // 動かしている間、または距離で絞り込んだ結果が、今の中心の条件に追いつくまで
+  const searching =
+    currentKey !== null && !failed && nearby?.key !== currentKey;
+  const loading = moving || searching;
+
   let message: string | undefined;
   if (failed) message = "スポットを取得できませんでした";
   else if (radius.enabled && !nearby) message = "読み込み中…";
@@ -132,8 +139,10 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
           gestureHandling="greedy"
           disableDefaultUI={false}
           onClick={() => setSelected(null)}
+          onCameraChanged={() => setMoving(true)}
           // 移動・ズームが落ち着いたときに、表示範囲と中心を更新する
           onIdle={(e) => {
+            setMoving(false);
             const nextBounds = e.map.getBounds()?.toJSON();
             const nextCenter = e.map.getCenter()?.toJSON();
             if (nextBounds) setBounds(nextBounds);
@@ -198,6 +207,7 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
         selectedId={selected?.id ?? null}
         onSelect={selectFromList}
         message={message}
+        loading={loading}
       />
     </div>
   );
