@@ -48,10 +48,10 @@ export function RadiusOverlay({
   const map = useMap();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
+  const placeRef = useRef<(() => void) | null>(null);
 
   // 円を入れる、地図の層の要素。層は地図と一緒に動くので、画面の中央に合わせて位置を直す
   const [pane, setPane] = useState<HTMLDivElement | null>(null);
-  const [frame, setFrame] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
   // 1 ピクセルあたりの距離が決まる、地図の緯度とズーム
   const [view, setView] = useState(() => ({
@@ -99,25 +99,38 @@ export function RadiusOverlay({
     container.style.zIndex = PANE_Z_INDEX;
 
     const overlay = new google.maps.OverlayView();
+    // 層は、地図の動きに合わせて動くが、その反映は center_changed とは別のタイミングになる。
+    // 投影から位置を計算すると、動かしている間、一瞬ずれた場所に円が出るので、
+    // 層の原点と地図の、実際の画面上の位置の差を測って、地図の左上に合わせる。
+    // React の state を経由すると、描画が 1 フレーム遅れるので、要素の style を直接書き換える
     const place = () => {
-      const center = map.getCenter();
-      const point =
-        center && overlay.getProjection()?.fromLatLngToDivPixel(center);
-      if (!point) return;
-      const { clientWidth: width, clientHeight: height } = map.getDiv();
-      setFrame({
-        x: point.x - width / 2,
-        y: point.y - height / 2,
-        width,
-        height,
-      });
+      const wrapper = wrapperRef.current;
+      if (!wrapper) return;
+      const div = map.getDiv();
+      const mapRect = div.getBoundingClientRect();
+      const origin = container.getBoundingClientRect();
+      wrapper.style.left = `${mapRect.left - origin.left}px`;
+      wrapper.style.top = `${mapRect.top - origin.top}px`;
+      wrapper.style.width = `${div.clientWidth}px`;
+      wrapper.style.height = `${div.clientHeight}px`;
     };
+    // 層やその親の位置（style）が変わったら、描画の前に、すぐ測り直す
+    const observer = new MutationObserver(place);
+    placeRef.current = place;
     overlay.onAdd = () => {
       overlay.getPanes()?.floatPane.appendChild(container);
       setPane(container);
+      for (
+        let el = container.parentElement;
+        el && el !== map.getDiv();
+        el = el.parentElement
+      ) {
+        observer.observe(el, { attributes: true, attributeFilter: ["style"] });
+      }
     };
     overlay.draw = place;
     overlay.onRemove = () => {
+      observer.disconnect();
       container.remove();
       setPane(null);
     };
@@ -128,10 +141,29 @@ export function RadiusOverlay({
       map.addListener("bounds_changed", place),
     ];
     return () => {
+      placeRef.current = null;
+      observer.disconnect();
       listeners.forEach((l) => l.remove());
       overlay.setMap(null);
     };
   }, [map]);
+
+  // 円の要素ができたら、すぐ位置を合わせる
+  useEffect(() => {
+    if (pane) placeRef.current?.();
+  }, [pane]);
+
+  // 円が見えている間は、毎フレーム位置を測り直す。層の反映は、イベントとは別のタイミングで、
+  // 動きが止まってからも起こる（ドラッグを離したときなど）ので、動いている間だけでは足りない
+  const visible = enabled || spread.amount < 1;
+  useEffect(() => {
+    if (!pane || !visible) return;
+    let id = requestAnimationFrame(function step() {
+      placeRef.current?.();
+      id = requestAnimationFrame(step);
+    });
+    return () => cancelAnimationFrame(id);
+  }, [pane, visible]);
 
   // 動きが止まったら、少し待ってから消す
   useEffect(() => {
@@ -205,12 +237,6 @@ export function RadiusOverlay({
       className={`pointer-events-none absolute overflow-hidden ${
         hidden ? "invisible" : ""
       }`}
-      style={{
-        left: frame.x,
-        top: frame.y,
-        width: frame.width,
-        height: frame.height,
-      }}
     >
       <svg
         width={size}
