@@ -39,6 +39,9 @@ export function SpotList({
 
   return (
     <aside className="flex h-[40dvh] shrink-0 flex-col border-t border-zinc-200 bg-white text-zinc-900 md:order-first md:h-full md:w-96 md:border-r md:border-t-0">
+      <h1 className="px-4 pt-4 pb-2 text-3xl font-extrabold">
+        位置情報探索アプリ
+      </h1>
       <h2
         aria-busy={loading}
         className="flex items-center gap-2 border-b border-zinc-200 px-4 py-3 text-sm font-semibold"
