@@ -24,7 +24,7 @@
 
 ## 実行手順
 
-1. 以下のコマンドを実行すると、DB・API・フロントエンドがすべて起動します
+1. 以下のコマンドを実行すると、DB・API・フロントエンドがすべて起動します。
 
    ```bash
    docker compose up -d --build
@@ -110,6 +110,6 @@
 - その他のURL
   - API: http://localhost:3001/
   - Swagger UI: http://localhost:3001/docs
-- 実際のプロジェクトを想定して、タスクは GitHub Projects で管理し、PRベースで開発しました<br/>
+- 実際のプロジェクトを想定して、タスクは GitHub Projects で管理し、PRベースで開発しました。<br/>
   https://github.com/users/RabbitProgram/projects/6
-- [公式利用規約](https://cloud.google.com/maps-platform/terms/maps-service-terms) の 6.3.2 によると、リバースジオコーディングの住所をバックエンド側でキャッシュして使い回すことは禁止されていたため、キャッシュ実装は見送りました
+- [公式利用規約](https://cloud.google.com/maps-platform/terms/maps-service-terms) の 6.3.2 によると、リバースジオコーディングの住所をバックエンド側でキャッシュして使い回すことは禁止されていたため、キャッシュ実装は見送りました。
