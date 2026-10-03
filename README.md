@@ -87,6 +87,17 @@
 - **ユニットテストの実装**<br/>
   自前で書くロジック部分のみ、ユニットテストを実装しました。<br/>
   PR作成時・PRコミット時に自動でテストが走るように GitHub Actions を設定し、デグレードを防ぐようにしました。
+- **Agent Skillsの導入**<br/>
+  少ないトークン量でより高精度に実装できるようにするために、各種スキルを導入しました。
+  - Docker<br/>
+    公式が提供しているものを使用<br/>
+    https://docs.docker.com/ai/skills/install/#claude-code
+  - pg-aiguide<br/>
+    PostgreSQL 用のSkills。プラグインを導入すれば PostGIS にも対応。スターが多く、更新頻度も高いのでこれを採用。<br/>
+    https://github.com/timescale/pg-aiguide
+  - antfu/skills<br/>
+    Vitest 用に、スターが多く更新頻度が高いこちらを採用。<br/>
+    https://github.com/antfu/skills
 
 ## 時間が足りず実装を簡略化した箇所や、今後の改善点
 
