@@ -2,7 +2,9 @@
 
 <p align="center">
   <img alt="Screenshot" width="600" src="./screenshot.png">
+</p>
 
+<p align="center">
   <img alt="Next.js" src="https://img.shields.io/badge/Next.js-000000?logo=nextdotjs&logoColor=white">
   <img alt="NestJS" src="https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white">
