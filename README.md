@@ -104,5 +104,8 @@
 
 ## 補足事項
 
-- バックエンドのURL: http://localhost:3001/
-- Swagger UI: http://localhost:3001/docs
+- その他のURL
+  - API: http://localhost:3001/
+  - Swagger UI: http://localhost:3001/docs
+- 実際のプロジェクトを想定して、タスクは GitHub Projects で管理し、PRベースで開発しました<br/>
+  https://github.com/users/RabbitProgram/projects/6
