@@ -12,7 +12,7 @@ export async function fetchSpotsNear(
   return fetchSpots({ lat, lng, radius });
 }
 
-// 地図の中心の住所。キャッシュ（Redis）と Geocoding API の呼び出しは、backend が行う
+// 地図の中心の住所。Geocoding API の呼び出しは、backend が行う
 export async function fetchCenterAddress(
   lat: number,
   lng: number,
