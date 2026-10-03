@@ -1,69 +1,89 @@
-# coding-test-20260929
+# 位置情報探索アプリ
 
-Next.js + NestJS + PostgreSQL/PostGIS の開発用スケルトン。
+## 環境構築
 
-| 層 | 技術 | ポート |
-|---|---|---|
-| frontend | Next.js (App Router) / Tailwind CSS | 3000 |
-| backend | NestJS / TypeORM | 3001 |
-| db | PostgreSQL 18.6 + PostGIS 3.6 | 5432 |
-| redis | Redis 8（逆ジオコーディングのキャッシュ。永続化なし） | （公開しない） |
+`cp .env.example .env` を実行して、Google Maps API キーを設定してください。
 
-## 起動
+## 実行手順
+
+1. 以下のコマンドを実行すると、DB・API・フロントエンドがすべて起動します
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
 
-`.env` がなくても起動します（既定値で動きます）。ただし、地図を表示するには Google Maps の API キーが必要です。
+2. http://localhost:3000/ にアクセスして、フロントエンドを確認してください。
+   地図上のマーカーまたはリスト表示の項目をクリックすると、そのスポットの詳細情報を吹き出しで表示します。
 
-```bash
-cp .env.example .env
-# .env の NEXT_PUBLIC_GOOGLE_MAPS_API_KEY に API キーを設定
-# 地図の中心の住所を表示するには、GOOGLE_MAPS_SERVER_API_KEY（サーバー用。Geocoding API を有効にする）も設定
-docker compose up
-```
+3. 範囲を絞り込んで検索する場合は、サイドバーにある「半径検索」を有効にしてください。
+   スライダーを操作するか、地図上で範囲の枠をドラッグすると領域を変更できます。
 
-API キーは Google Cloud で「Maps JavaScript API」を有効化して発行します。ブラウザに公開されるキーなので、「HTTPリファラー」と「API」の制限を必ず設定してください。
+## 使用した主要ライブラリとその選定理由
 
-起動時の流れ: `db` が ready → `backend` がマイグレーション実行 → シード投入 → 起動 → `frontend` 起動。
+### フロントエンド
 
-- http://localhost:3000 — スポットをマーカー表示する地図と、スポット一覧（要 API キー）。一覧は、表示範囲内のスポット、または「地図の中心からの距離」で絞り込んだスポット（距離は、スライダー、または地図上の円の線をドラッグして指定。絞り込み中、範囲外のピンはグレー）
-- http://localhost:3001/ — backend が起動していれば `{"status":"ok"}`
-- http://localhost:3001/spots — スポット一覧（JSON）。`?lat=&lng=&radius=`（メートル）を付けると、中心から指定距離以内のスポットを近い順に返す（PostGIS）
-- http://localhost:3001/geocode?lat=&lng= — 座標の住所（丁目まで）。約 100 m の格子ごとに Redis へキャッシュし、同じ格子は Geocoding API を呼ばない（保存期間は `GEOCODE_CACHE_TTL_SECONDS`。Redis が落ちていてもキャッシュなしで動く）
-- http://localhost:3001/docs — Swagger UI（開発時のみ。`NODE_ENV=production` では無効）／ `/docs-json` は OpenAPI 仕様
+| ライブラリ                             | 選定理由                               |
+| -------------------------------------- | -------------------------------------- |
+| `openapi-fetch` / `openapi-typescript` | APIを型安全に管理するために採用        |
+| Vitest                                 | 高速なユニットテストが行えるように採用 |
 
-## DB
+### バックエンド
 
-- スキーマは TypeORM のマイグレーションのみで管理（`backend/src/database/migrations/`）。`synchronize` は使いません。
-- シードは `backend/seeds/seed.csv`（ヘッダ: `name,category,lat,long,address`）。起動時に自動で取り込まれ、`name` をキーに upsert するので、再起動しても重複しません（`name` はCSV内で一意にしてください）。CSV から行を消しても、DB の行は消えません。
-- 初期化し直す場合: `docker compose down -v`
+| ライブラリ        | 選定理由                                                             |
+| ----------------- | -------------------------------------------------------------------- |
+| `@nestjs/swagger` | Swagger UI でAPIドキュメントを表示できるようにするために採用         |
+| Redis             | 高速・永続化の必要がないリバースジオコーディングのキャッシュ用に採用 |
+| Vitest            | 高速なユニットテストが行えるように採用                               |
 
-## 開発
+### データベース
 
-- ソースはコンテナにマウントされ、ホットリロードされます。
-- 依存パッケージを変更したら: `docker compose up --build -V`
-- backend のテスト: `cd backend && npm test`（DB 不要）
-- frontend のテスト: `cd frontend && npm test`（Vitest + Testing Library）
-- CI: PR の作成時と、PR への push 時に、GitHub Actions（`.github/workflows/test.yml`）が backend / frontend を並列に検証します（lint、テスト、ビルド、API の型の同期確認）。
+| 名前                 | 選定理由                                                         |
+| -------------------- | ---------------------------------------------------------------- |
+| PostgreSQL + PostGIS | 距離での絞り込み検索が、用意されている関数で手軽に行えるため採用 |
 
-## API の型（backend → frontend）
+### その他
 
-フロントの API 呼び出しは、backend の定義から自動生成した型で保護されています（URL や項目名の typo はコンパイルエラーになります）。
+| 名前                       | 選定理由                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------- |
+| GitHub Actions             | ESLint / Vitest / Prettier / ビルドの自動実行で、コード品質を担保するために採用 |
+| Google Maps JavaScript API | Webページ上での地図表示に使用                                                   |
+| Google Geocoding API       | リバースジオコーディングで座標から住所を取得する際に使用                        |
 
-```
-backend の DTO/コントローラー
-  → backend/openapi.json（OpenAPI 仕様）
-  → frontend/lib/api/schema.d.ts（型）
-  → frontend/lib/api/client.ts（openapi-fetch の型付きクライアント）
-```
+## 実装時に特に工夫した点、および技術的な判断を行った箇所
 
-backend の API（エンドポイントやレスポンス）を変えたら、次の順に実行します。
+### 特に工夫した点
 
-```bash
-cd backend && npm run openapi     # openapi.json を更新（DB 不要）
-cd ../frontend && npm run api:types  # schema.d.ts を更新
-```
+- より直感的な範囲検索
+  地図上に表示された円形の枠をドラッグすることでも範囲を変更できるようにしました。
+  また、範囲に含まれるスポットのマーカーとそれ以外とで色を変えることで、視認性を向上させました。
+- 検索の高度化
+  - 「座標のわずかな移動ではAPIを叩かない」は歓迎要件にありましたが、Google Maps API はリクエスト数によっては課金対象になってしまうため、機能要件として優先度を上げて実装しました。
+    高速に地図を移動した場合でも、スロットル処理で最短1秒間隔でリクエストを送るように間引くことで、リクエスト数を抑えつつ、ユーザーの操作に対してもある程度のレスポンスを返せるようにしました。
+  - 「過去の検索結果を再利用するロジック」も導入しています。
+    高速処理・永続化の必要がないという観点から PostgreSQL とは別に Redis を導入し、検索結果をキャッシュすることで同じエリアでのリクエストがあった場合に、リバースジオコーディングのリクエストを行わずにキャッシュから結果を返すようにしました。
+    （粒度は座標の小数第3位までにしているため、約110m以内の範囲であればキャッシュから返される）
+    Geocoding API は最大30日間のキャッシュが認められているため、キャッシュの有効期限は30日間に設定しています。
+    ※ [公式利用規約](https://cloud.google.com/maps-platform/terms/maps-service-terms) の 6.3.1 を参照
 
-`openapi.json` の更新を忘れると、backend のテスト（`npm test`）が失敗します。
+#### 技術的な判断箇所
+
+- PostGIS の採用
+  `ST_Distance` が使えるようになるので距離計算を DB 側で行えるようになり、開発工数削減・パフォーマンス向上が見込めるため採用しました。
+- 絞り込み機能の実行場所
+  フロント側で絞り込みを行うとAPIのリクエスト回数を減らすことができますが、今後データが変動した場合に都度最新のものを取得できるようにするため、API 側にパラメータで絞り込み条件を渡して絞り込みを行うようにしました。
+- OpenAPI で自動生成されたAPIの型の利用
+  型安全にすることでコンパイル時にエラーで検知できるように ＆ 型の二重管理を防ぐために、フロント側では直書きしないようにしました。
+- ユニットテストの実装
+  自前で書くロジック部分のみ、ユニットテストを実装しました。
+  PR作成時・PRコミット時に自動でテストが走るように GitHub Actions を設定し、デグレードを防ぐようにしました。
+
+## 時間が足りず実装を簡略化した箇所や、今後の改善点
+
+- 今はフロント側へのスロットル処理のみに留めていてAPI単体の大量コールには対応できていないため、API側にもスロットル処理を入れたり最大コール制限を設けたりすることで、よりリクエストに対して厳格に制御できるようにする。
+  （不正アクセスがあった場合でも、影響を最小限に抑えられるようにするための取り組み）
+- 今はテストはユニットテストのみ実装しているので、今後のプロダクト展開を踏まえてインテグレーションテストやE2Eテストも実装することで、より堅牢なアプリケーションにしてデグレを防ぐ。
+
+## 補足事項
+
+- バックエンドのURL: http://localhost:3001/
+- Swagger UI: http://localhost:3001/docs
