@@ -1,8 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { StatusResponseDto } from './status-response.dto.js';
 
-@ApiTags('Status')
 @Controller()
 export class AppController {
   @Get()

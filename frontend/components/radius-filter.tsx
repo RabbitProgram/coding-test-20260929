@@ -27,7 +27,11 @@ export function RadiusFilter({
         半径検索
       </label>
 
-      <div className="mt-2 flex items-center gap-3">
+      <div
+        className={`mt-2 flex items-center gap-3 transition-opacity duration-300 ${
+          enabled ? "" : "opacity-50"
+        }`}
+      >
         <input
           type="range"
           aria-label="中心からの距離（km）"

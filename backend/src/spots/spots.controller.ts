@@ -3,13 +3,11 @@ import {
   ApiBadRequestResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiTags,
 } from '@nestjs/swagger';
 import { FindSpotsQueryDto } from './find-spots-query.dto.js';
 import { SpotResponseDto } from './spot-response.dto.js';
 import { SpotsService } from './spots.service.js';
 
-@ApiTags('Spots')
 @Controller('spots')
 export class SpotsController {
   constructor(private readonly spotsService: SpotsService) {}

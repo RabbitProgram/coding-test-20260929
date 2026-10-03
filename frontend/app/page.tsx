@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { SpotMap } from "@/components/spot-map";
 import { fetchSpots, type Spot } from "@/lib/spots";
 
-export const metadata = { title: "スポットマップ" };
+export const metadata = { title: "位置情報探索アプリ" };
 
 function Notice({ children }: { children: React.ReactNode }) {
   return (

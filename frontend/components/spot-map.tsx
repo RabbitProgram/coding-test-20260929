@@ -28,12 +28,9 @@ const INITIAL_ZOOM = 10;
 // 値が変わるたびに吹き出しが開き直され、自動パンで、動かした地図が引き戻されるため。
 const INFO_WINDOW_OFFSET: [number, number] = [0, -40];
 
-// 距離で絞り込んでいるとき、範囲外のスポットのピン
-const OUT_OF_RANGE_PIN = {
-  background: "#9ca3af",
-  borderColor: "#6b7280",
-  glyphColor: "#e5e7eb",
-};
+// 距離で絞り込んでいるとき、範囲外のスポットのピン。色を差し替えるのではなく、
+// フィルターで灰色にして、切り替わるときにフェードさせる
+const OUT_OF_RANGE_FILTER = "grayscale(1) brightness(1.15) opacity(0.7)";
 
 // 距離で絞り込む条件が変わってから、検索を始めるまでの待ち時間（スライダー操作中の連続検索を避ける）
 const SEARCH_DELAY_MS = 250;
@@ -56,6 +53,8 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
   // 地図の読み込み前は null（一覧は空）
   const [bounds, setBounds] = useState<Bounds | null>(null);
   const [center, setCenter] = useState<LatLng | null>(null);
+  // 地図を動かしている間（止まるまで）。一覧は、止まってから更新するので、その間は最新ではない
+  const [moving, setMoving] = useState(false);
   const [radius, setRadius] = useState({ enabled: false, km: 5 });
   // 距離で絞り込んだ結果。key は、どの条件の結果かを表す（spots: null は取得の失敗）
   const [nearby, setNearby] = useState<{
@@ -118,6 +117,11 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
     ? `中心から ${radius.km} km 以内（${listSpots.length} 件）`
     : `表示範囲のスポット（${listSpots.length} 件）`;
 
+  // 動かしている間、または距離で絞り込んだ結果が、今の中心の条件に追いつくまで
+  const searching =
+    currentKey !== null && !failed && nearby?.key !== currentKey;
+  const loading = moving || searching;
+
   let message: string | undefined;
   if (failed) message = "スポットを取得できませんでした";
   else if (radius.enabled && !nearby) message = "読み込み中…";
@@ -132,8 +136,10 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
           gestureHandling="greedy"
           disableDefaultUI={false}
           onClick={() => setSelected(null)}
+          onCameraChanged={() => setMoving(true)}
           // 移動・ズームが落ち着いたときに、表示範囲と中心を更新する
           onIdle={(e) => {
+            setMoving(false);
             const nextBounds = e.map.getBounds()?.toJSON();
             const nextCenter = e.map.getCenter()?.toJSON();
             if (nextBounds) setBounds(nextBounds);
@@ -149,9 +155,12 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
                 title={spot.name}
                 // 範囲内のピンが、範囲外のピンの上に重なるようにする
                 zIndex={outOfRange ? 0 : 1}
+                // 灰色への切り替えは、マーカー自体のフィルターで、フェードさせる
+                className="transition-[filter] duration-300"
+                style={{ filter: outOfRange ? OUT_OF_RANGE_FILTER : "none" }}
                 onClick={() => setSelected(spot)}
               >
-                <Pin {...(outOfRange ? OUT_OF_RANGE_PIN : {})} />
+                <Pin />
               </AdvancedMarker>
             );
           })}
@@ -173,8 +182,9 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
 
         <CenterAddress />
 
-        {radius.enabled && center && (
+        {center && (
           <RadiusOverlay
+            enabled={radius.enabled}
             initialCenter={center}
             km={radius.km}
             onKmChange={(km) => setRadius((prev) => ({ ...prev, km }))}
@@ -198,6 +208,7 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
         selectedId={selected?.id ?? null}
         onSelect={selectFromList}
         message={message}
+        loading={loading}
       />
     </div>
   );

@@ -5,13 +5,11 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiServiceUnavailableResponse,
-  ApiTags,
 } from '@nestjs/swagger';
 import { GeocodeService } from './geocode.service.js';
 import { ReverseAddressResponseDto } from './reverse-address-response.dto.js';
 import { ReverseGeocodeQueryDto } from './reverse-geocode-query.dto.js';
 
-@ApiTags('Geocode')
 @Controller('geocode')
 export class GeocodeController {
   constructor(private readonly geocodeService: GeocodeService) {}

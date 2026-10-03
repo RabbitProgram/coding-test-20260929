@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { formatDistance } from "@/lib/distance";
 import type { Spot } from "@/lib/spots";
+import { Spinner } from "./spinner";
 
 type Props = {
   heading: string;
@@ -13,6 +14,8 @@ type Props = {
   onSelect: (spot: Spot) => void;
   /** 一覧の代わりに表示するメッセージ（読み込み中・エラーなど） */
   message?: string;
+  /** 地図を動かしていて、一覧が最新ではないとき（前の結果を薄く表示して、見出しにスピナーを出す） */
+  loading?: boolean;
 };
 
 export function SpotList({
@@ -22,6 +25,7 @@ export function SpotList({
   selectedId,
   onSelect,
   message,
+  loading = false,
 }: Props) {
   const selectedRef = useRef<HTMLLIElement>(null);
 
@@ -35,15 +39,24 @@ export function SpotList({
 
   return (
     <aside className="flex h-[40dvh] shrink-0 flex-col border-t border-zinc-200 bg-white text-zinc-900 md:order-first md:h-full md:w-96 md:border-r md:border-t-0">
-      <h2 className="border-b border-zinc-200 px-4 py-3 text-sm font-semibold">
+      <h1 className="px-4 pt-4 pb-2 text-3xl font-extrabold">
+        位置情報探索アプリ
+      </h1>
+      <h2
+        aria-busy={loading}
+        className="flex items-center gap-2 border-b border-zinc-200 px-4 py-3 text-sm font-semibold"
+      >
         {heading}
+        {loading && <Spinner className="size-3.5" />}
       </h2>
       {controls}
 
       {emptyMessage ? (
         <p className="px-4 py-6 text-sm text-zinc-500">{emptyMessage}</p>
       ) : (
-        <ul className="min-h-0 flex-1 divide-y divide-zinc-200 overflow-y-auto">
+        <ul
+          className={`min-h-0 flex-1 divide-y divide-zinc-200 overflow-y-auto transition-opacity ${loading ? "opacity-50" : ""}`}
+        >
           {spots.map((spot) => {
             const selected = spot.id === selectedId;
             return (
