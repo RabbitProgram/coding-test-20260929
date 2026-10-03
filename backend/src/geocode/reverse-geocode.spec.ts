@@ -1,34 +1,8 @@
-import {
-  cacheKey,
-  pickAddress,
-  snapToGrid,
-  type GeocodeResult,
-} from './reverse-geocode.js';
+import { pickAddress, type GeocodeResult } from './reverse-geocode.js';
 
 const result = (types: string[], formatted_address: string): GeocodeResult => ({
   types,
   formatted_address,
-});
-
-describe('snapToGrid / cacheKey', () => {
-  it('小数第 3 位に丸める', () => {
-    expect(snapToGrid(35.681236, 139.767125)).toEqual({
-      lat: 35.681,
-      lng: 139.767,
-    });
-  });
-
-  it('同じ格子の座標は、同じキーになる', () => {
-    const a = snapToGrid(35.6812, 139.7671);
-    const b = snapToGrid(35.6814, 139.7669);
-    expect(cacheKey(a.lat, a.lng)).toBe(cacheKey(b.lat, b.lng));
-  });
-
-  it('別の格子の座標は、別のキーになる', () => {
-    const a = snapToGrid(35.681, 139.767);
-    const b = snapToGrid(35.683, 139.767);
-    expect(cacheKey(a.lat, a.lng)).not.toBe(cacheKey(b.lat, b.lng));
-  });
 });
 
 describe('pickAddress', () => {

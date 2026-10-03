@@ -7,7 +7,6 @@ Next.js + NestJS + PostgreSQL/PostGIS の開発用スケルトン。
 | frontend | Next.js (App Router) / Tailwind CSS | 3000 |
 | backend | NestJS / TypeORM | 3001 |
 | db | PostgreSQL 18.6 + PostGIS 3.6 | 5432 |
-| redis | Redis 8（逆ジオコーディングのキャッシュ。永続化なし） | （公開しない） |
 
 ## 起動
 
@@ -31,7 +30,7 @@ API キーは Google Cloud で「Maps JavaScript API」を有効化して発行�
 - http://localhost:3000 — スポットをマーカー表示する地図と、スポット一覧（要 API キー）。一覧は、表示範囲内のスポット、または「地図の中心からの距離」で絞り込んだスポット（距離は、スライダー、または地図上の円の線をドラッグして指定。絞り込み中、範囲外のピンはグレー）
 - http://localhost:3001/ — backend が起動していれば `{"status":"ok"}`
 - http://localhost:3001/spots — スポット一覧（JSON）。`?lat=&lng=&radius=`（メートル）を付けると、中心から指定距離以内のスポットを近い順に返す（PostGIS）
-- http://localhost:3001/geocode?lat=&lng= — 座標の住所（丁目まで）。約 100 m の格子ごとに Redis へキャッシュし、同じ格子は Geocoding API を呼ばない（保存期間は `GEOCODE_CACHE_TTL_SECONDS`。Redis が落ちていてもキャッシュなしで動く）
+- http://localhost:3001/geocode?lat=&lng= — 座標の住所（丁目まで）。Google の規約上、住所は保存（キャッシュ）せず、毎回 Geocoding API を呼ぶ
 - http://localhost:3001/docs — Swagger UI（開発時のみ。`NODE_ENV=production` では無効）／ `/docs-json` は OpenAPI 仕様
 
 ## DB
