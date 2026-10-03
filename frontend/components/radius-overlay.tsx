@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEvent,
+} from "react";
 import { createPortal } from "react-dom";
 import { useMap } from "@vis.gl/react-google-maps";
 import type { LatLng } from "@/lib/bounds";
@@ -172,8 +178,9 @@ export function RadiusOverlay({
     return () => clearTimeout(timer);
   }, [active, tick]);
 
-  // 有効にすると、画面の外から縮んで焦点が合うように収まり、無効にすると、広がって画面の外へ出る
-  useEffect(() => {
+  // 有効にすると、画面の外から縮んで焦点が合うように収まり、無効にすると、広がって画面の外へ出る。
+  // 描画の前に実行する（初回は offscreen が 0 のままなので、km の半径の円が一瞬だけ描かれてしまう）
+  useLayoutEffect(() => {
     const wrapper = wrapperRef.current;
     if (!wrapper) return;
     const { width, height } = wrapper.getBoundingClientRect();
@@ -183,6 +190,8 @@ export function RadiusOverlay({
     const ease = enabled ? easeOutCubic : easeInQuad;
     const duration = TRANSITION_MS * Math.abs(to - from);
     const start = performance.now();
+    // 最初のフレームを待たずに、画面の外の半径を反映する
+    setSpread({ amount: from, offscreen });
 
     let frame = requestAnimationFrame(function step(now) {
       const progress =
