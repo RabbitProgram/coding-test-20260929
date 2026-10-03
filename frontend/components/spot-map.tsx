@@ -12,6 +12,7 @@ import {
 import { fetchSpotsNear } from "@/app/actions";
 import { spotsInBounds, type Bounds, type LatLng } from "@/lib/bounds";
 import type { Spot } from "@/lib/spots";
+import { CenterAddress } from "./center-address";
 import { RadiusFilter } from "./radius-filter";
 import { RadiusOverlay } from "./radius-overlay";
 import { SpotList } from "./spot-list";
@@ -169,6 +170,8 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
             </InfoWindow>
           )}
         </Map>
+
+        <CenterAddress />
 
         {radius.enabled && center && (
           <RadiusOverlay
