@@ -15,6 +15,8 @@ type Props = {
   onSelect: (spot: Spot) => void;
   /** 一覧の代わりに表示するメッセージ（読み込み中・エラーなど） */
   message?: string;
+  /** 最初の結果を待っているとき（一覧の代わりに、中央にスピナーだけを表示する） */
+  pending?: boolean;
   /** 地図を動かしていて、一覧が最新ではないとき（前の結果を薄く表示して、見出しにスピナーを出す） */
   loading?: boolean;
 };
@@ -26,6 +28,7 @@ export function SpotList({
   selectedId,
   onSelect,
   message,
+  pending = false,
   loading = false,
 }: Props) {
   const selectedRef = useRef<HTMLLIElement>(null);
@@ -35,7 +38,7 @@ export function SpotList({
     selectedRef.current?.scrollIntoView({ block: "nearest" });
   }, [selectedId]);
 
-  const noSpots = !message && spots.length === 0;
+  const noSpots = !pending && !message && spots.length === 0;
 
   return (
     <aside className="flex h-[40dvh] shrink-0 flex-col border-t border-zinc-200 bg-white text-zinc-900 md:order-first md:h-full md:w-96 md:border-r md:border-t-0">
@@ -51,7 +54,11 @@ export function SpotList({
       </h2>
       {controls}
 
-      {noSpots ? (
+      {pending ? (
+        <div className="flex min-h-0 flex-1 items-center justify-center">
+          <Spinner className="size-10 border-4" />
+        </div>
+      ) : noSpots ? (
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 text-zinc-400">
           <X aria-hidden="true" strokeWidth={2} className="size-16" />
           <p className="text-base font-semibold">スポットなし</p>

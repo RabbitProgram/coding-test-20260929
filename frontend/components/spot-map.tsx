@@ -124,7 +124,8 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
 
   let message: string | undefined;
   if (failed) message = "スポットを取得できませんでした";
-  else if (radius.enabled && !nearby) message = "読み込み中…";
+  // 距離で絞り込んだ最初の結果が届くまで（一覧の代わりに、中央にスピナーだけを出す）
+  const pending = !failed && radius.enabled && !nearby;
 
   return (
     <div className="flex h-full w-full flex-col md:flex-row">
@@ -208,6 +209,7 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
         selectedId={selected?.id ?? null}
         onSelect={selectFromList}
         message={message}
+        pending={pending}
         loading={loading}
       />
     </div>

@@ -21,6 +21,12 @@ describe("SpotList", () => {
     expect(screen.queryByText("スポットなし")).toBeNull();
   });
 
+  it("pending のときはスピナーだけを表示する", () => {
+    render(<SpotList {...props} spots={[]} pending />);
+    expect(screen.getByRole("status")).toBeTruthy();
+    expect(screen.queryByText("スポットなし")).toBeNull();
+  });
+
   it("スポットがあるときは「スポットなし」を表示しない", () => {
     render(
       <SpotList
