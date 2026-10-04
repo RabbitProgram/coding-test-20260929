@@ -7,7 +7,6 @@ import {
   InfoWindow,
   Map,
   Pin,
-  useMap,
 } from "@vis.gl/react-google-maps";
 import { fetchSpotsNear } from "@/app/actions";
 import { spotsInBounds, type Bounds, type LatLng } from "@/lib/bounds";
@@ -48,7 +47,6 @@ export function SpotMap({ apiKey, spots }: { apiKey: string; spots: Spot[] }) {
 
 // 地図と一覧で、表示範囲・選択中のスポット・距離の絞り込みを共有する
 function SpotExplorer({ spots }: { spots: Spot[] }) {
-  const map = useMap();
   const [selected, setSelected] = useState<Spot | null>(null);
   // 地図の読み込み前は null（一覧は空）
   const [bounds, setBounds] = useState<Bounds | null>(null);
@@ -87,11 +85,6 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
       ),
     [selected],
   );
-
-  const selectFromList = (spot: Spot) => {
-    setSelected(spot);
-    map?.panTo({ lat: spot.lat, lng: spot.lng });
-  };
 
   // 距離で絞り込んでいるとき、範囲内のスポットの id。一覧と同じ、backend の検索結果を使う。
   // 結果が届くまで（読み込み中・失敗）は null で、ピンの色は変えない
@@ -207,7 +200,7 @@ function SpotExplorer({ spots }: { spots: Spot[] }) {
         }
         spots={listSpots}
         selectedId={selected?.id ?? null}
-        onSelect={selectFromList}
+        onSelect={setSelected}
         message={message}
         pending={pending}
         loading={loading}
