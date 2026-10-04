@@ -4,7 +4,7 @@ import type { Spot } from './spot.entity.js';
 describe('toSpotResponse', () => {
   it('GeoJSON の [経度, 緯度] を lat / lng に変換する', () => {
     const spot = {
-      id: '1',
+      id: 1,
       name: '東京駅',
       category: '交通機関',
       address: '東京都千代田区',
@@ -12,7 +12,7 @@ describe('toSpotResponse', () => {
     } as Spot;
 
     expect(toSpotResponse(spot)).toEqual({
-      id: '1',
+      id: 1,
       name: '東京駅',
       category: '交通機関',
       address: '東京都千代田区',
@@ -23,7 +23,7 @@ describe('toSpotResponse', () => {
 
   it('距離を渡したときだけ、distance を含める', () => {
     const spot = {
-      id: '1',
+      id: 1,
       name: '東京駅',
       category: '交通機関',
       address: null,

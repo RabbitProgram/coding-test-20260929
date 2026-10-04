@@ -31,7 +31,7 @@ describe("SpotList", () => {
     render(
       <SpotList
         {...props}
-        spots={[{ id: "1", name: "東京駅", category: "駅" } as never]}
+        spots={[{ id: 1, name: "東京駅", category: "駅" } as never]}
       />,
     );
     expect(screen.getByText("東京駅")).toBeTruthy();

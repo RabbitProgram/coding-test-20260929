@@ -11,7 +11,7 @@ type Props = {
   /** 見出しの下に表示する操作部品（絞り込みのスライダーなど） */
   controls?: ReactNode;
   spots: Spot[];
-  selectedId: string | null;
+  selectedId: number | null;
   onSelect: (spot: Spot) => void;
   /** 一覧の代わりに表示するメッセージ（読み込み中・エラーなど） */
   message?: string;

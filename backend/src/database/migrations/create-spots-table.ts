@@ -7,7 +7,7 @@ export class CreateSpotsTable1790000000000 implements MigrationInterface {
     await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS postgis`);
     await queryRunner.query(`
       CREATE TABLE spots (
-        id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+        id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
         name TEXT NOT NULL UNIQUE,
         category TEXT NOT NULL,
         address TEXT,
