@@ -77,10 +77,10 @@ export interface components {
         };
         SpotResponseDto: {
             /**
-             * @description スポット ID（bigint のため文字列で返す）
+             * @description スポット ID
              * @example 1
              */
-            id: string;
+            id: number;
             /**
              * @description スポット名
              * @example 東京タワー

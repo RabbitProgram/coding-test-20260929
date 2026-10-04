@@ -4,10 +4,10 @@ import type { Point } from 'geojson';
 @Entity('spots')
 export class Spot {
   @PrimaryGeneratedColumn('identity', {
-    type: 'bigint',
+    type: 'integer',
     generatedIdentity: 'ALWAYS',
   })
-  id: string;
+  id: number;
 
   @Column('text', { unique: true })
   name: string;
@@ -20,12 +20,4 @@ export class Spot {
 
   @Column({ type: 'geography', spatialFeatureType: 'Point', srid: 4326 })
   location: Point;
-
-  @Column({
-    type: 'timestamp with time zone',
-    name: 'created_at',
-    insert: false,
-    update: false,
-  })
-  createdAt: Date;
 }

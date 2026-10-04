@@ -2,11 +2,8 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /** GET /spots が返す 1 件分。フロントの型は、この定義から自動生成する */
 export class SpotResponseDto {
-  @ApiProperty({
-    example: '1',
-    description: 'スポット ID（bigint のため文字列で返す）',
-  })
-  id: string;
+  @ApiProperty({ type: 'integer', example: 1, description: 'スポット ID' })
+  id: number;
 
   @ApiProperty({ example: '東京タワー', description: 'スポット名' })
   name: string;

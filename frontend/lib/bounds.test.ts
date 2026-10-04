@@ -28,11 +28,11 @@ describe("isInBounds", () => {
 describe("spotsInBounds", () => {
   it("範囲内のスポットだけを、元の順序のまま返す", () => {
     const spots = [
-      { id: "1", lat: 35.68, lng: 139.76 },
-      { id: "2", lat: 43.06, lng: 141.35 }, // 札幌
-      { id: "3", lat: 35.65, lng: 139.74 },
+      { id: 1, lat: 35.68, lng: 139.76 },
+      { id: 2, lat: 43.06, lng: 141.35 }, // 札幌
+      { id: 3, lat: 35.65, lng: 139.74 },
     ];
 
-    expect(spotsInBounds(spots, tokyo).map((s) => s.id)).toEqual(["1", "3"]);
+    expect(spotsInBounds(spots, tokyo).map((s) => s.id)).toEqual([1, 3]);
   });
 });

@@ -165,9 +165,9 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string",
-            "example": "1",
-            "description": "スポット ID（bigint のため文字列で返す）"
+            "type": "integer",
+            "example": 1,
+            "description": "スポット ID"
           },
           "name": {
             "type": "string",
