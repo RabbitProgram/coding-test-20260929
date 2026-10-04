@@ -20,12 +20,4 @@ export class Spot {
 
   @Column({ type: 'geography', spatialFeatureType: 'Point', srid: 4326 })
   location: Point;
-
-  @Column({
-    type: 'timestamp with time zone',
-    name: 'created_at',
-    insert: false,
-    update: false,
-  })
-  createdAt: Date;
 }

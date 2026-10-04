@@ -11,8 +11,7 @@ export class CreateSpotsTable1790000000000 implements MigrationInterface {
         name TEXT NOT NULL UNIQUE,
         category TEXT NOT NULL,
         address TEXT,
-        location GEOGRAPHY(POINT, 4326) NOT NULL,
-        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        location GEOGRAPHY(POINT, 4326) NOT NULL
       )
     `);
     await queryRunner.query(
